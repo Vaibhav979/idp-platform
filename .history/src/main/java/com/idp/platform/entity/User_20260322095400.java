@@ -1,7 +1,0 @@
-package com.idp.platform.entity;
-
-@Entity
-public class User {
-    
-    private Long id;
-}
