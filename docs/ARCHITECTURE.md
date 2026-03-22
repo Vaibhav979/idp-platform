@@ -1,0 +1,53 @@
+# Architecture
+
+## System Type
+
+Monolithic backend (for now)
+
+## Components
+
+### 1. Controller Layer
+
+Handles incoming HTTP requests
+
+### 2. Service Layer
+
+Contains business logic (deployment simulation)
+
+### 3. Repository Layer
+
+Handles database interactions via JPA
+
+---
+
+## Deployment Flow (Simulated)
+
+User → Create Project
+User → Trigger Deployment
+
+System:
+
+1. Creates deployment (PENDING)
+2. Moves to BUILDING
+3. Moves to DEPLOYING
+4. Moves to RUNNING
+
+---
+
+## Current Limitations
+
+* No real CI/CD
+* No containerization
+* No Git integration
+* No authentication
+
+---
+
+## Future Evolution
+
+| Current           | Future              |
+| ----------------- | ------------------- |
+| Thread simulation | GitHub Actions      |
+| Enum status       | ArgoCD sync         |
+| Logs field        | Centralized logging |
+| REST polling      | Event-driven system |
