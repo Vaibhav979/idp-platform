@@ -16,6 +16,8 @@ services:
     container_name: idp-backend
     ports:
       - "8080:8080"
+    volumes:
+      - ./repos:/app/repos      
     depends_on:
       - postgres
     environment:

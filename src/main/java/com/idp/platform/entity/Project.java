@@ -9,10 +9,13 @@ import lombok.Data;
 @Entity
 @Data
 public class Project {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String name;
+    private String repoPath;
+    private String projectType;
     private String repoUrl;
 
     @ManyToOne

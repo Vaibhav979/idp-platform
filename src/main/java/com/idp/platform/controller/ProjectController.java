@@ -1,5 +1,7 @@
 package com.idp.platform.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,8 +17,9 @@ public class ProjectController {
     @Autowired
     private ProjectService service;
 
-    @PostMapping
-    public Project create(@RequestBody Project project) {
-        return service.createProject(project);
+    @PostMapping("/from-repo")
+    public Project createFromRepo(@RequestBody Map<String, String> body) {
+        String repoUrl = body.get("repoUrl");
+        return service.createProjectFromRepo(repoUrl);
     }
 }

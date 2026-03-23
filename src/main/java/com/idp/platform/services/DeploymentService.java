@@ -20,32 +20,42 @@ public class DeploymentService {
 
     public Deployment triggerDeployment(Long projectId) {
         Project project = projectRepo.findById(projectId).orElseThrow();
+        System.out.println("=== DEPLOYMENT STARTED ===");
+        System.out.println("Project: " + project.getName());
+        System.out.println("Type: " + project.getProjectType());
+        System.out.println("Repo Path: " + project.getRepoPath());
         Deployment deployment = new Deployment();
         deployment.setProject(project);
         deployment.setStatus(DeploymentStatus.PENDING);
 
         deployment = deploymentRepo.save(deployment);
 
-        simulatePipeline(deployment);
+        simulatePipeline(deployment, project);
 
         return deployment;
     }
 
-    private void simulatePipeline(Deployment deployment) {
-        new Thread(() -> {
-            try {
-                Thread.sleep(2000);
-                updateStatus(deployment, DeploymentStatus.BUILDING);
+    private void simulatePipeline(Deployment deployment, Project project) {
+    new Thread(() -> {
+        try {
+            Thread.sleep(2000);
+            updateStatus(deployment, DeploymentStatus.BUILDING);
+            
+            System.out.println("Building " + project.getProjectType() + " app...");
 
-                Thread.sleep(2000);
-                updateStatus(deployment, DeploymentStatus.DEPLOYING);
+            Thread.sleep(2000);
+            updateStatus(deployment, DeploymentStatus.DEPLOYING);
 
-                Thread.sleep(2000);
-                updateStatus(deployment, DeploymentStatus.RUNNING);
+            System.out.println("Deploying from: " + project.getRepoPath());
 
-            } catch (Exception e) {
-                updateStatus(deployment, DeploymentStatus.FAILED);
-            }
+            Thread.sleep(2000);
+            updateStatus(deployment, DeploymentStatus.RUNNING);
+
+            System.out.println("Deployment successful!");
+
+        } catch (Exception e) {
+            updateStatus(deployment, DeploymentStatus.FAILED);
+        }
         }).start();
     }
 

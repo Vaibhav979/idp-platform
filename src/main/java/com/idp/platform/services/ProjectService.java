@@ -9,9 +9,25 @@ import com.idp.platform.repository.ProjectRepository;
 @Service
 public class ProjectService {
     @Autowired
-    private ProjectRepository projectRepo;
+    private ProjectRepository repo;
 
-    public Project createProject(Project project) {
-        return projectRepo.save(project);
+    @Autowired
+    private RepoService repoService;
+
+    @Autowired
+    private ProjectDetectionService detectionService;
+
+    public Project createProjectFromRepo(String repoUrl) {
+        
+        String repoPath = repoService.cloneRepo(repoUrl);
+        String type = detectionService.detectProjectType(repoPath);
+
+        Project project = new Project();
+        project.setName(repoUrl.substring(repoUrl.lastIndexOf("/")+1));
+        project.setRepoUrl(repoUrl);
+        project.setRepoPath(repoPath);
+        project.setProjectType(type);
+
+        return repo.save(project);
     }
 }
