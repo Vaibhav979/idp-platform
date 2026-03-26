@@ -6,18 +6,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RepoService {
-    
+
     private static final String BASE_DIR = "repos/";
 
-    public String cloneRepo(String repoUrl){
+    public String cloneRepo(String repoUrl) {
         try {
             validateRepoUrl(repoUrl);
 
-            String repoName = repoUrl.substring(repoUrl.lastIndexOf("/") + 1).replace(".git","");
+            String repoName = repoUrl.substring(repoUrl.lastIndexOf("/") + 1).replace(".git", "");
             String targetDir = BASE_DIR + repoName;
 
             File baseDir = new File(BASE_DIR);
-            if(!baseDir.exists()) {
+            if (!baseDir.exists()) {
                 baseDir.mkdirs();
             }
 
@@ -42,7 +42,7 @@ public class RepoService {
     }
 
     private void validateRepoUrl(String repoUrl) {
-        if (repoUrl == null || !repoUrl.startsWith("https://") || !repoUrl.endsWith(".git")) {
+        if (repoUrl == null || !repoUrl.startsWith("https://")) {
             throw new IllegalArgumentException("Invalid repo URL");
         }
     }

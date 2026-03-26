@@ -17,6 +17,7 @@ public class Project {
     private String repoPath;
     private String projectType;
     private String repoUrl;
+    private String actualRepoPath;
 
     @ManyToOne
     private User user;

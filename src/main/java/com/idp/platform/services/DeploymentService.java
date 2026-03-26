@@ -8,6 +8,7 @@ import com.idp.platform.entity.Project;
 import com.idp.platform.enums.DeploymentStatus;
 import com.idp.platform.repository.DeploymentRepository;
 import com.idp.platform.repository.ProjectRepository;
+import com.idp.platform.services.DeploymentService;
 
 @Service
 public class DeploymentService {
@@ -17,6 +18,12 @@ public class DeploymentService {
 
     @Autowired
     private ProjectRepository projectRepo;
+
+    @Autowired
+    private DockerfileService dockerfileService;
+
+    @Autowired
+    private DockerService dockerService;
 
     public Deployment triggerDeployment(Long projectId) {
         Project project = projectRepo.findById(projectId).orElseThrow();
@@ -30,32 +37,39 @@ public class DeploymentService {
 
         deployment = deploymentRepo.save(deployment);
 
-        simulatePipeline(deployment, project);
+        trigger(deployment, project);
 
         return deployment;
     }
 
-    private void simulatePipeline(Deployment deployment, Project project) {
-    new Thread(() -> {
-        try {
-            Thread.sleep(2000);
-            updateStatus(deployment, DeploymentStatus.BUILDING);
-            
-            System.out.println("Building " + project.getProjectType() + " app...");
+    private void trigger(Deployment deployment, Project project) {
+        new Thread(() -> {
+            try {
+                System.out.println("Generating Dockerfile...");
+                updateStatus(deployment, DeploymentStatus.BUILDING);
 
-            Thread.sleep(2000);
-            updateStatus(deployment, DeploymentStatus.DEPLOYING);
+                dockerfileService.generateDockerfile(
+                        project.getProjectType(),
+                        project.getActualRepoPath());
 
-            System.out.println("Deploying from: " + project.getRepoPath());
+                System.out.println("Building Docker image...");
+                String imageName = "app-" + project.getId();
+                dockerService.buildImage(project.getActualRepoPath(), imageName);
 
-            Thread.sleep(2000);
-            updateStatus(deployment, DeploymentStatus.RUNNING);
+                System.out.println("Running container...");
+                updateStatus(deployment, DeploymentStatus.DEPLOYING);
 
-            System.out.println("Deployment successful!");
+                int port = 3000 + project.getId().intValue();
+                dockerService.runContainer(imageName, port);
 
-        } catch (Exception e) {
-            updateStatus(deployment, DeploymentStatus.FAILED);
-        }
+                updateStatus(deployment, DeploymentStatus.RUNNING);
+
+                System.out.println("Deployment successful!");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                updateStatus(deployment, DeploymentStatus.FAILED);
+            }
         }).start();
     }
 
